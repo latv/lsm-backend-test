@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('guide', function (Blueprint $table) {
-            $table->id(); 
-            $table->string('title', 100); 
+            $table->id();
+            $table->string('title', 100);
             $table->unsignedTinyInteger('channel_nr');
             $table->timestamp('starts_at');
             $table->timestamp('ends_at');
