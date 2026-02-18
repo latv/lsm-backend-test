@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Guide;
+use App\Services\GuideService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class GuideController extends Controller
 {
-    public function index(Request $request, int $channel_nr, string $date): JsonResponse
+    public function __construct(protected GuideService $guideService) {}
+
+    public function channelGuideByDate(int $channel_nr, string $date): JsonResponse
     {
-        $channelProgramm = Guide::query()
-            ->where('channel_nr', $channel_nr)
-            ->forTvDay($date)
-            ->get();
+        if (! strtotime($date)) {
+            return response()->json(['error' => 'Invalid date format. Use YYYY-MM-DD.'], 400);
+        }
+
+        $guide = $this->guideService->getAdjustedGuide($channel_nr, $date);
 
         return response()->json([
-            'date' => $date,
-            'channel_nr' => $channel_nr,
-            'channel_programm' => $channelProgramm,
+            'data' => $guide,
         ]);
     }
 }
