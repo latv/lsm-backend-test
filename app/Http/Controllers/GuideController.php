@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreGuideRequest;
 use App\Services\GuideService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Guide;
 
 class GuideController extends Controller
 {
@@ -52,5 +54,14 @@ class GuideController extends Controller
         return response()->json([
             'data' => $upcomingGuides,
         ]);
+    }
+
+    public function store(StoreGuideRequest $request): JsonResponse
+    {
+        $guide = Guide::create($request->validated());
+
+        return response()->json([
+            'data' => $guide
+        ], 201);
     }
 }
