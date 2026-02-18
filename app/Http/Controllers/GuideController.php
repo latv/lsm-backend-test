@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\GuideService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
 class GuideController extends Controller
 {
@@ -15,10 +16,41 @@ class GuideController extends Controller
             return response()->json(['error' => 'Invalid date format. Use YYYY-MM-DD.'], 400);
         }
 
-        $guide = $this->guideService->getAdjustedGuide($channel_nr, $date);
+        $cacheKey = "guide_channel_{$channel_nr}_date_{$date}";
+
+        // cache for 1 hour
+        $guide = Cache::remember($cacheKey, 3600, function () use ($channel_nr, $date) {
+            return $this->guideService->getAdjustedGuide($channel_nr, $date);
+        });
 
         return response()->json([
             'data' => $guide,
+        ]);
+    }
+
+    public function currentGuide(int $channel_nr): JsonResponse
+    {
+        $guide = $this->guideService->getCurrentAndUpcomingGuides($channel_nr, 1);
+
+        if (! $guide) {
+            return response()->json(['message' => 'No broadcast is currently on air.'], 404);
+        }
+
+        return response()->json([
+            'data' => $guide,
+        ]);
+    }
+
+    public function upcomingGuides(int $channel_nr): JsonResponse
+    {
+        $upcomingGuides = $this->guideService->getCurrentAndUpcomingGuides($channel_nr);
+
+        if (! $upcomingGuides) {
+            return response()->json(['message' => 'No upcoming broadcasts found.'], 404);
+        }
+
+        return response()->json([
+            'data' => $upcomingGuides,
         ]);
     }
 }

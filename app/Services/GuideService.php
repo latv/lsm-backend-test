@@ -31,4 +31,25 @@ class GuideService
             return $guide;
         });
     }
+
+    public function getCurrentAndUpcomingGuides(int $channelNr, int $limit = 10): Collection
+    {
+        $currentShowStart = Guide::select('starts_at')
+            ->where('channel_nr', $channelNr)
+            ->where('starts_at', '<=', now())
+            ->orderBy('starts_at', 'desc')
+            ->limit(1);
+
+        $guides = Guide::where('channel_nr', $channelNr)
+            ->where('starts_at', '>=', $currentShowStart)
+            ->orderBy('starts_at', 'asc')
+            ->limit($limit + 1) // added '+1' so can adjust end time of current show to next show's start
+            ->get();
+
+        if ($guides->isEmpty()) {
+            return null;
+        }
+
+        return $this->adjustEndTimes($guides)->take($limit);
+    }
 }
