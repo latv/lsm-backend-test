@@ -34,17 +34,11 @@ class StoreGuideRequest extends FormRequest
                 $endsAt = Carbon::parse($this->ends_at);
 
                 $overlaps = Guide::where('channel_nr', $this->channel_nr)
-                    ->where(function ($query) use ($startsAt, $endsAt) {
-                        $query
-                            ->whereBetween('starts_at', [$startsAt, $endsAt])
-                            ->orWhereBetween('ends_at', [$startsAt, $endsAt])
-                            ->orWhere(function ($query) use ($startsAt, $endsAt) {
-                                $query
-                                    ->where('starts_at', '<=', $startsAt)
-                                    ->where('ends_at', '>=', $endsAt);
-                            });
-                    })
-                    ->exists();
+                                ->where(function ($query) use ($startsAt, $endsAt) {
+                                    $query->where('starts_at', '<', $endsAt)
+                                          ->where('ends_at', '>', $startsAt);
+                                })
+                                ->exists();
 
                 if ($overlaps) {
                     $validator->errors()->add(
