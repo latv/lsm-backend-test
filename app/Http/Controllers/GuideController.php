@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreGuideRequest;
+use App\Models\Guide;
 use App\Services\GuideService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Guide;
 
 class GuideController extends Controller
 {
@@ -61,7 +61,7 @@ class GuideController extends Controller
         $guide = Guide::create($request->validated());
 
         return response()->json([
-            'data' => $guide
+            'data' => $guide,
         ], 201);
     }
 }

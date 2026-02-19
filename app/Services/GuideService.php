@@ -11,7 +11,7 @@ class GuideService
     {
         $guides = Guide::forTvDay($date)
             ->where('channel_nr', $channelNr)
-            ->orderBy('starts_at', 'asc')
+            ->oldest('starts_at')
             ->get();
 
         return $this->adjustEndTimes($guides);
@@ -32,22 +32,28 @@ class GuideService
         });
     }
 
-    public function getCurrentAndUpcomingGuides(int $channelNr, int $limit = 10): Collection
+    public function getCurrentAndUpcomingGuides(int $channelNr, int $limit = 10): ?Collection
     {
         $currentShowStart = Guide::select('starts_at')
             ->where('channel_nr', $channelNr)
             ->where('starts_at', '<=', now())
-            ->orderBy('starts_at', 'desc')
+            ->latest('starts_at')
             ->limit(1);
 
         $guides = Guide::where('channel_nr', $channelNr)
             ->where('starts_at', '>=', $currentShowStart)
-            ->orderBy('starts_at', 'asc')
-            ->limit($limit + 1) // added '+1' so can adjust end time of current show to next show's start
+            ->oldest('starts_at')
+            ->limit($limit + 1)
             ->get();
 
         if ($guides->isEmpty()) {
             return null;
+        }
+
+        if ($guides->count() === 1) {
+            if ($guides->first()->end_at < now()) {
+                return null;
+            }
         }
 
         return $this->adjustEndTimes($guides)->take($limit);
