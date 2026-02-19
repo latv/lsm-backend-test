@@ -18,6 +18,11 @@ class Guide extends Model
         'ends_at',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public static function booted(): void
     {
         $flush = function (self $guide): void {
