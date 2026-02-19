@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Guide extends Model
 {
@@ -16,6 +17,20 @@ class Guide extends Model
         'starts_at',
         'ends_at',
     ];
+
+    public static function booted(): void
+    {
+        $flush = function (self $guide): void {
+            $date = Carbon::parse($guide->starts_at)->toDateString();
+
+            Cache::forget("guide_channel_{$guide->channel_nr}_date_{$date}");
+            Cache::forget("upcoming_guides_channel_{$guide->channel_nr}");
+        };
+
+        static::created($flush);
+        static::updated($flush);
+        static::deleted($flush);
+    }
 
     public function scopeForTvDay(Builder $query, string $date): Builder
     {

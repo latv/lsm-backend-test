@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Channel;
 use App\Http\Requests\StoreGuideRequest;
 use App\Models\Guide;
 use App\Services\GuideService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
-use App\Enums\Channel;
 
 class GuideController extends Controller
 {
@@ -15,7 +14,7 @@ class GuideController extends Controller
 
     public function channelGuideByDate(int $channel_nr, string $date): JsonResponse
     {
-        if (!in_array($channel_nr, Channel::values())) {
+        if (! in_array($channel_nr, Channel::values())) {
             return response()->json(['error' => 'Invalid channel number.'], 422);
         }
 
@@ -23,21 +22,25 @@ class GuideController extends Controller
             return response()->json(['error' => 'Invalid date format. Use YYYY-MM-DD.'], 400);
         }
 
-        $cacheKey = "guide_channel_{$channel_nr}_date_{$date}";
-
-        // cache for 1 hour
-        $guide = Cache::remember($cacheKey, 3600, function () use ($channel_nr, $date) {
-            return $this->guideService->getAdjustedGuide($channel_nr, $date);
-        });
+        $guide = $this->guideService->getAdjustedGuide($channel_nr, $date);
 
         return response()->json([
             'data' => $guide,
         ]);
     }
 
+    public function store(StoreGuideRequest $request): JsonResponse
+    {
+        $guide = Guide::create($request->validated());
+
+        return response()->json([
+            'data' => $guide,
+        ], 201);
+    }
+
     public function currentGuide(int $channel_nr): JsonResponse
     {
-        if (!in_array($channel_nr, Channel::values())) {
+        if (! in_array($channel_nr, Channel::values())) {
             return response()->json(['error' => 'Invalid channel number.'], 422);
         }
 
@@ -63,14 +66,5 @@ class GuideController extends Controller
         return response()->json([
             'data' => $upcomingGuides,
         ]);
-    }
-
-    public function store(StoreGuideRequest $request): JsonResponse
-    {
-        $guide = Guide::create($request->validated());
-
-        return response()->json([
-            'data' => $guide,
-        ], 201);
     }
 }
