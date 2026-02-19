@@ -57,6 +57,10 @@ class GuideController extends Controller
 
     public function upcomingGuides(int $channel_nr): JsonResponse
     {
+        if (! in_array($channel_nr, Channel::values())) {
+            return response()->json(['error' => 'Invalid channel number.'], 422);
+        }
+
         $upcomingGuides = $this->guideService->getCurrentAndUpcomingGuides($channel_nr);
 
         if (! $upcomingGuides) {
