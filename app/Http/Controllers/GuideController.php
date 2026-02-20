@@ -24,6 +24,10 @@ class GuideController extends Controller
 
         $guide = $this->guideService->getAdjustedGuide($channel_nr, $date);
 
+        if ($guide->isEmpty()) {
+            return response()->json(['message' => 'No broadcasts found for the specified date.'], 404);
+        }
+
         return response()->json([
             'data' => $guide,
         ]);

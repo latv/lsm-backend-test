@@ -101,6 +101,15 @@ class GuideControllerTest extends TestCase
 
     public function test_can_fetch_channel_guide_by_date(): void
     {
+        $payload = [
+            'title' => 'Morning News',
+            'channel_nr' => $this->validChannel,
+            'starts_at' => '2026-02-20 08:00:00',
+            'ends_at' => '2026-02-20 09:00:00',
+        ];
+
+        $this->postJson('/api/guide', $payload)->assertStatus(201);
+
         $response = $this->getJson("/api/guide/{$this->validChannel}/2026-02-20");
 
         $response->assertStatus(200)
