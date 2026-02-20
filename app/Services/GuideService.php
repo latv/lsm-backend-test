@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\Guide;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class GuideService
@@ -63,7 +63,7 @@ class GuideService
         return $adjustedGuides;
     }
 
-    private function adjustEndTimes(Collection $guides): Collection
+    public function adjustEndTimes(Collection $guides): Collection
     {
         $guides = $guides->values();
         $count = $guides->count();
