@@ -1,8 +1,10 @@
 <?php
+
 namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use App\Services\GuideService;
 use Illuminate\Database\Eloquent\Collection;
+use PHPUnit\Framework\TestCase;
 
 class GuideServiceTest extends TestCase
 {
@@ -14,7 +16,7 @@ class GuideServiceTest extends TestCase
             (object) ['title' => 'Show 3', 'starts_at' => '2026-02-21 12:00:00', 'ends_at' => '2026-02-21 13:00:00'],
         ]);
 
-        $service = new \App\Services\GuideService();
+        $service = new GuideService;
 
         $adjustedShows = $service->adjustEndTimes($shows);
 

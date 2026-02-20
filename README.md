@@ -19,6 +19,8 @@ composer install
 cp .env.example .env
 ```
 
+After that check correct crendential for DB_USERNAME and DB_PASSWORD
+
 4. Start the Docker containers using Laravel Sail. This will set up the application environment along with a MySQL 8.4 database:
 
 ```bash
