@@ -57,14 +57,4 @@ class StoreGuideRequest extends FormRequest
             'ends_at.after' => 'The end time must be after the start time.',
         ];
     }
-
-    protected function failedValidation(ValidatorContract $validator): void
-    {
-        throw new HttpResponseException(
-            response()->json([
-                'message' => 'Validation failed.',
-                'errors' => $validator->errors(),
-            ], 422)
-        );
-    }
 }
