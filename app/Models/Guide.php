@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ChannelTVShowCount;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -29,7 +30,10 @@ class Guide extends Model
             $date = Carbon::parse($guide->starts_at)->toDateString();
 
             Cache::forget("guide_channel_{$guide->channel_nr}_date_{$date}");
-            Cache::forget("upcoming_guides_channel_{$guide->channel_nr}");
+
+            foreach (ChannelTVShowCount::values() as $limit) {
+                Cache::forget("upcoming_guides_channel_{$guide->channel_nr}_limit_{$limit}");
+            }
         };
 
         static::created($flush);

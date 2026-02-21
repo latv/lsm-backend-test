@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ChannelTVShowCount;
 use App\Models\Guide;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -26,7 +27,7 @@ class GuideService
         });
     }
 
-    public function getCurrentAndUpcomingGuides(int $channelNr, int $limit = 10): ?Collection
+    public function getCurrentAndUpcomingGuides(int $channelNr, int $limit = ChannelTVShowCount::upcoming->value): ?Collection
     {
         $cacheKey = "upcoming_guides_channel_{$channelNr}_limit_{$limit}";
 

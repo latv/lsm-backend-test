@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Channel;
+use App\Enums\ChannelTVShowCount;
 use App\Http\Requests\StoreGuideRequest;
 use App\Models\Guide;
 use App\Services\GuideService;
@@ -48,7 +49,7 @@ class GuideController extends Controller
             return response()->json(['error' => 'Invalid channel number.'], 422);
         }
 
-        $guide = $this->guideService->getCurrentAndUpcomingGuides($channel_nr, 1);
+        $guide = $this->guideService->getCurrentAndUpcomingGuides($channel_nr, ChannelTVShowCount::current->value);
 
         if (! $guide) {
             return response()->json(['message' => 'No broadcast is currently on air.'], 404);
