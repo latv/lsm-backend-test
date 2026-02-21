@@ -44,7 +44,7 @@ class GuideService
         $guides = Guide::where('channel_nr', $channelNr)
             ->where('starts_at', '>=', $currentShowStart)
             ->oldest('starts_at')
-            ->limit($limit + 1)
+            ->limit($limit + 1) // add 1 to include more extra show, so can caluclate last show's end time
             ->get();
 
         if ($guides->isEmpty() || ($guides->count() === 1 && $guides[0]->ends_at <= now())) {
