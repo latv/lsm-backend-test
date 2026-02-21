@@ -26,7 +26,7 @@ class GuideService
 
             $lastShow = $adjustedGuides->last();
 
-            // Check if the last show's start time is at or after the TV day cutoff
+            // Check if the last show's start time is after new TV day end time, if so, remove it from the list
             if ($lastShow && Carbon::parse($lastShow->starts_at)->gte($tvDayEnd)) {
                 $adjustedGuides->pop();
             }
