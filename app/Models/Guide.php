@@ -45,8 +45,21 @@ class Guide extends Model
     {
         $start = Carbon::parse($date)->setTime(6, 0, 0);
         $end = $start->copy()->addDay();
+        $nextDayStart = $end->copy()->addDay();
 
-        return $query->where('starts_at', '>=', $start)
-            ->where('starts_at', '<', $end);
+        // Get the ID of the first show of the next TV day,
+        // so we can calculaate the end time of the last show of the current TV day
+        $firstNextDayId = (clone $query->getQuery())
+            ->where('starts_at', '>=', $end)
+            ->where('starts_at', '<', $nextDayStart)
+            ->orderBy('starts_at', 'asc')
+            ->limit(1)
+            ->value('id');
+
+        return $query->where(function (Builder $q) use ($start, $end) {
+            $q->where('starts_at', '>=', $start)
+                ->where('starts_at', '<', $end);
+        })
+            ->when($firstNextDayId, fn ($q) => $q->orWhere('id', $firstNextDayId));
     }
 }

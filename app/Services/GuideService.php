@@ -15,15 +15,23 @@ class GuideService
         $cacheKey = "guide_channel_{$channelNr}_date_{$date}";
 
         $tvDayEnd = Carbon::parse($date)->addDay()->setTime(6, 0, 0);
-        $secondsUntilTvDayEnds = now()->diffInSeconds($tvDayEnd, false);
 
-        return Cache::remember($cacheKey, $secondsUntilTvDayEnds, function () use ($channelNr, $date) {
+        return Cache::remember($cacheKey, 86400, function () use ($channelNr, $date, $tvDayEnd) {
             $guides = Guide::forTvDay($date)
                 ->where('channel_nr', $channelNr)
                 ->oldest('starts_at')
                 ->get();
 
-            return $this->adjustEndTimes($guides);
+            $adjustedGuides = $this->adjustEndTimes($guides);
+
+            $lastShow = $adjustedGuides->last();
+
+            // Check if the last show's start time is at or after the TV day cutoff
+            if ($lastShow && Carbon::parse($lastShow->starts_at)->gte($tvDayEnd)) {
+                $adjustedGuides->pop();
+            }
+
+            return $adjustedGuides;
         });
     }
 
